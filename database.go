@@ -15,7 +15,7 @@ const (
 	dbname   = "notes_dev"
 )
 
-func connectToDb() *sql.DB {
+func connectDb() *sql.DB {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
@@ -26,8 +26,6 @@ func connectToDb() *sql.DB {
 		panic(err)
 	}
 
-	defer db.Close()
-
 	err = db.Ping()
 
 	if err != nil {
@@ -37,4 +35,20 @@ func connectToDb() *sql.DB {
 	fmt.Println("Successfully connected!")
 
 	return db
+}
+
+func migrateDb(db *sql.DB) {
+	sqlStatement := `
+	CREATE TABLE notes (
+		id SERIAL PRIMARY KEY,
+		body TEXT
+	  );
+	  `
+
+	_, err := db.Exec(sqlStatement)
+
+	if err != nil {
+		// panic(err)
+		fmt.Println(err)
+	}
 }
